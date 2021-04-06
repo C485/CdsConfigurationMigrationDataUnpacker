@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CdsConfigurationMigrationDataUnpacker", "CdsConfigurationMigrationDataUnpacker\CdsConfigurationMigrationDataUnpacker.csproj", "{B6C2F332-A58D-46CB-B131-CA86E927E2A1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6C2F332-A58D-46CB-B131-CA86E927E2A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6C2F332-A58D-46CB-B131-CA86E927E2A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6C2F332-A58D-46CB-B131-CA86E927E2A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6C2F332-A58D-46CB-B131-CA86E927E2A1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {94769AFC-EE27-42FB-98F0-4A7637A13929}
+	EndGlobalSection
+EndGlobal

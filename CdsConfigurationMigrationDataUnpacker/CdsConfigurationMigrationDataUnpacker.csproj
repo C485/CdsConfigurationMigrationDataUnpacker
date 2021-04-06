@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <Copyright>C485/Kamil Skoracki</Copyright>
+    <PackageIcon>icon.ico</PackageIcon>
+    <Description>Tool for unpacking .zip file produced by CDS Configuration Migration 
+
+Icon from https://www.freepik.com/</Description>
+    <Authors>C485/Kamil Skoracki</Authors>
+    <ApplicationIcon>Icon\icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dawn.Guard" Version="1.12.0" />
+    <PackageReference Include="PowerArgs" Version="3.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Icon\icon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
