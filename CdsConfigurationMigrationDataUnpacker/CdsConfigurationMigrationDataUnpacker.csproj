@@ -10,6 +10,9 @@
 Icon from https://www.freepik.com/</Description>
     <Authors>C485/Kamil Skoracki</Authors>
     <ApplicationIcon>Icon\icon.ico</ApplicationIcon>
+    <PackageProjectUrl>https://github.com/C485/CdsConfigurationMigrationDataUnpacker</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/C485/CdsConfigurationMigrationDataUnpacker</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
