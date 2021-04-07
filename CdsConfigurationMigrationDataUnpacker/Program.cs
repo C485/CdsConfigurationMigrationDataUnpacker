@@ -11,7 +11,7 @@ namespace CdsConfigurationMigrationDataUnpacker
         {
             try
             {
-                var parsed = Args.Parse<PortalUnpackerArgs>(args);
+                PortalUnpackerArgs parsed = Args.Parse<PortalUnpackerArgs>(args);
                 if (string.IsNullOrEmpty(parsed.ConfigFile))
                     parsed.ConfigFile = Path.Combine(Directory.GetCurrentDirectory(), "config", "default.json");
 

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CdsConfigurationMigrationDataUnpacker
 {
-    public class IOLayer
+    public abstract class IOLayer
     {
         private const string DataXmlFileName = "data.xml";
 

@@ -100,7 +100,7 @@ namespace CdsConfigurationMigrationDataUnpacker
 
         private static void SaveAllFiles(ConfigItem configItem, XmlNode item, string recordId, string finalFolderPath)
         {
-            if (configItem.FileFields.Length <= 0)
+            if (configItem.FileFields.Length == 0)
                 return;
 
             uint fileNameCounter = 0;
