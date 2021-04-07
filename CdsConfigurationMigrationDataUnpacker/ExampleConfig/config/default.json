@@ -1,0 +1,26 @@
+{
+	"ConfigItems": [
+		{
+			"EntityName": "adx_contentsnippet",
+			"FileFields": [
+				{
+					"FieldName": "adx_value",
+					"IsBase64": false,
+					"FileNameFieldName": "adx_name",
+					"OverrideFileExtension": ".html",
+					"FileNameFormat": "[RootName]_[RootId]_[Name][Extension]"
+				}
+			],
+			"UnpackToFolder": false,
+			"RecordNameFields": [
+				"adx_name"
+			],
+			"RecordNameCombineMode": 0,
+			"RecordNameFormat": "[Name]_[Id]",
+			"FolderNameFormat": "[DisplayName]_[LogicalName]",
+			"HtmlDecodeFields": [
+				"adx_value"
+			]
+		}
+	]
+}

@@ -50,7 +50,7 @@ namespace CdsConfigurationMigrationDataUnpacker
                 Guard
                     .Argument(entityNode, nameof(entityNode))
                     .NotNull()
-                    .Member(p => p.Attributes, u => u.NotNull().Contains("displayname"));
+                    .Member(p => p.Attributes, u => u.NotNull().Require(m => m["displayname"] != null));
                 string displayName = entityNode.Attributes["displayname"].Value;
                 string mainFolderName = FormatHelper
                     .ReplaceAllTags(configItem.FolderNameFormat,
@@ -64,24 +64,25 @@ namespace CdsConfigurationMigrationDataUnpacker
                     Guard
                         .Argument(item, nameof(item))
                         .NotNull()
-                        .Member(p => p.Attributes, u => u.Contains("id"));
+                        .Member(p => p.Attributes, u => u.Require(m => m["id"] != null));
                     string recordId = item.Attributes["id"].Value;
-                    string name = GetXmlNodeAttributeFromFieldByNames(item, configItem.RecordNameFields, false, false, configItem.RecordNameCombineMode);
+                    string name = ClearFileName(GetXmlNodeAttributeFromFieldByNames(item, configItem.RecordNameFields, false, false, configItem.RecordNameCombineMode));
 
                     string fileName = FormatHelper
-                        .ReplaceAllTags(configItem.FolderNameFormat,
-                            ("[Name]", ClearFileName(name)),
+                        .ReplaceAllTags(configItem.RecordNameFormat,
+                            ("[Name]", name),
                             ("[Id]", recordId)
                         );
                     string finalFolderPath = mainFolderPath;
                     if (configItem.UnpackToFolder)
                         finalFolderPath = Directory.CreateDirectory(Path.Combine(finalFolderPath, fileName)).FullName;
-                    string xmlFilePath = Path.Combine(finalFolderPath, configItem.UnpackToFolder ? "data.xml" : $"{fileName}.xml");
+                    string xmlFileName = configItem.UnpackToFolder ? "data.xml" : $"{fileName}.xml";
+                    string xmlFilePath = Path.Combine(finalFolderPath, xmlFileName);
 
                     DecodeHtmlFieldsValue(configItem, item);
-                    SaveAllFiles(configItem, item, recordId, finalFolderPath);
+                    SaveAllFiles(configItem, item, recordId, finalFolderPath, name);
 
-                    File.WriteAllText(xmlFilePath, item.OuterXml);
+                    File.WriteAllText(xmlFilePath, item.OuterXml, Encoding.UTF8);
                 }
             }
         }
@@ -98,7 +99,7 @@ namespace CdsConfigurationMigrationDataUnpacker
             }
         }
 
-        private static void SaveAllFiles(ConfigItem configItem, XmlNode item, string recordId, string finalFolderPath)
+        private static void SaveAllFiles(ConfigItem configItem, XmlNode item, string rootRecordId, string finalFolderPath, string rootName)
         {
             if (configItem.FileFields.Length == 0)
                 return;
@@ -110,47 +111,47 @@ namespace CdsConfigurationMigrationDataUnpacker
                 FileField configFile = Array.Find(configItem.FileFields, p => p.FieldName == singleFieldsName);
                 if (configFile == null)
                     continue;
-                ++fileNameCounter;
                 string content = singleField.Attributes["value"].Value;
-                string fieldFileName = string.IsNullOrEmpty(configFile.FileNameFieldName)
-                    ? $"{recordId}_{fileNameCounter}"
-                    : GetXmlNodeAttributeFromFieldByNames(singleField, new string[] { configFile.FileNameFieldName }, true, false);
+                string partialFieldFileName = string.IsNullOrEmpty(configFile.FileNameFieldName)
+                    ? $"{fileNameCounter++}"
+                    : GetXmlNodeAttributeFromFieldByNames(item, new string[] { configFile.FileNameFieldName }, true, false);
+                string oryginalExtension = Path.GetExtension(partialFieldFileName);
+                string fieldFileNameWithoutExtension = Path.GetFileNameWithoutExtension(partialFieldFileName);
+                string fieldFileName = ClearFileName(FormatHelper
+                    .ReplaceAllTags(configFile.FileNameFormat,
+                        ("[RootId]", rootRecordId),
+                        ("[Name]", fieldFileNameWithoutExtension),
+                        ("[Extension]", oryginalExtension),
+                        ("[RootName]", rootName)
+                    ));
 
-                if (string.IsNullOrEmpty(configFile.OverrideFileExtension))
+                if (!string.IsNullOrEmpty(configFile.OverrideFileExtension))
                 {
-                    if (Path.HasExtension(fieldFileName))
-                    {
-                        fieldFileName = Path.GetFileNameWithoutExtension(fieldFileName) + configFile.OverrideFileExtension;
-                    }
-                    else
-                    {
-                        fieldFileName += configFile.OverrideFileExtension;
-                    }
+                    fieldFileName = Path.ChangeExtension(fieldFileName, configFile.OverrideFileExtension);
                 }
-                else if (Path.HasExtension(fieldFileName))
+                else if (!Path.HasExtension(fieldFileName))
                 {
-                    fieldFileName += ".data";
+                    fieldFileName = Path.ChangeExtension(fieldFileName, ".data");
                 }
 
-                if (!string.IsNullOrEmpty(content))
+                if (string.IsNullOrEmpty(content))
+                    continue;
+                string filePath = Path.Combine(finalFolderPath, ClearFileName(fieldFileName));
+                if (configFile.IsBase64 == true)
                 {
-                    string filePath = Path.Combine(finalFolderPath, fieldFileName);
-                    if (configFile.IsBase64 == true)
-                    {
-                        byte[] data = Convert.FromBase64String(content);
-                        File.WriteAllBytes(filePath, data);
-                    }
-                    else
-                    {
-                        File.WriteAllText(filePath, content);
-                    }
+                    byte[] data = Convert.FromBase64String(content);
+                    File.WriteAllBytes(filePath, data);
+                }
+                else
+                {
+                    File.WriteAllText(filePath, content, Encoding.UTF8);
                 }
             }
         }
 
         private static string GetXmlNodeAttributeFromFieldByNames(XmlNode node, string[] fieldNames, bool throwException = false, bool removeItemFromNode = false, NameCombineMode? nameCombineMode = null)
         {
-            StringBuilder sb = nameCombineMode == NameCombineMode.CombineAll ? new(512) : null;
+            StringBuilder sb = nameCombineMode == NameCombineMode.CombineAllNotNull ? new(512) : null;
             foreach (string nodeName in fieldNames)
             {
                 XmlNode fieldNode = node.SelectSingleNode($"field[@name='{nodeName}']");
@@ -159,14 +160,14 @@ namespace CdsConfigurationMigrationDataUnpacker
                 if (removeItemFromNode)
                     node.RemoveChild(fieldNode);
                 string value = HttpUtility.HtmlDecode(fieldNode.Attributes["value"].Value);
-                if (nameCombineMode == NameCombineMode.CombineAll)
+                if (nameCombineMode == NameCombineMode.CombineAllNotNull)
                 {
                     sb.Append(value);
                     continue;
                 }
                 return value;
             }
-            if (nameCombineMode == NameCombineMode.CombineAll)
+            if (nameCombineMode == NameCombineMode.CombineAllNotNull)
                 return sb.ToString();
             return throwException ? throw new ArgumentNullException($"Field node with name [{string.Join(',', fieldNames)}] wasn't found.") : string.Empty;
         }

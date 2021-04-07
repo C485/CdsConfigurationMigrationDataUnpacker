@@ -27,4 +27,8 @@ Icon from https://www.freepik.com/</Description>
     </None>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="XCOPY &quot;$(ProjectDir)ExampleConfig&quot; &quot;$(TargetDir)&quot; /S /Y" />
+  </Target>
+
 </Project>

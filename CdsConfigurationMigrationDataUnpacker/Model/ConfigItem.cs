@@ -17,6 +17,6 @@ namespace CdsConfigurationMigrationDataUnpacker.Model
     public enum NameCombineMode
     {
         FirstNotNull,
-        CombineAll
+        CombineAllNotNull
     }
 }
